@@ -25,7 +25,7 @@ body.notification-body {
 }
 
 .notification-content {
-    padding: 16px;
+    padding: 14px 16px;
     flex: 1;
 }
 
@@ -86,7 +86,7 @@ body.notification-body {
     color: #cbd5e1;
     line-height: 1.4;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

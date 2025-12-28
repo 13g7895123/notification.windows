@@ -11,9 +11,12 @@ interface NotificationOptions {
 export class NotificationManager {
     private activeNotifications: BrowserWindow[] = [];
     private readonly WINDOW_WIDTH = 350;
-    private readonly WINDOW_HEIGHT = 120;
-    private readonly MARGIN = 60;
+    private readonly WINDOW_HEIGHT = 160;
+    private readonly MARGIN_BOTTOM = 60;
+    private readonly MARGIN_RIGHT = 10;
+    private readonly NOTIFICATION_SPACING = 5;
     private readonly MAX_NOTIFICATIONS = 5;
+
 
     constructor() {
         this.setupIPC();
@@ -92,11 +95,11 @@ export class NotificationManager {
     private repositionNotifications() {
         const { workArea } = screen.getPrimaryDisplay();
         // 從右下角開始堆疊
-        let currentY = workArea.y + workArea.height - this.MARGIN;
+        let currentY = workArea.y + workArea.height - this.MARGIN_BOTTOM;
 
         // 反向遍歷 (最新的在最下面)
         [...this.activeNotifications].reverse().forEach((win, index) => {
-            const x = workArea.x + workArea.width - this.WINDOW_WIDTH - this.MARGIN;
+            const x = workArea.x + workArea.width - this.WINDOW_WIDTH - this.MARGIN_RIGHT;
             const y = currentY - this.WINDOW_HEIGHT;
 
             try {
@@ -110,7 +113,7 @@ export class NotificationManager {
                 // 視窗可能已經銷毀
             }
 
-            currentY -= (this.WINDOW_HEIGHT + this.MARGIN);
+            currentY -= (this.WINDOW_HEIGHT + this.NOTIFICATION_SPACING);
         });
     }
 }
