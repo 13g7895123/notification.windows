@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Notification App Configuration",
+  "description": "通知監控程式的設定檔格式定義，適用於 Go 和 Electron 版本",
+  "type": "object",
+  "properties": {
+    "domain": {
+      "type": "string",
+      "description": "API 伺服器網域（包含 http:// 或 https://）",
+      "examples": ["http://localhost:9204", "https://api.example.com"]
+    },
+    "project": {
+      "type": "string",
+      "description": "要監控的專案名稱，留空則監控所有專案",
+      "examples": ["free_youtube", ""]
+    },
+    "interval": {
+      "type": "integer",
+      "description": "查詢間隔時間（秒）",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 3600
+    },
+    "debug": {
+      "type": "boolean",
+      "description": "是否啟用 Debug 模式",
+      "default": false
+    }
+  },
+  "required": ["domain"],
+  "additionalProperties": false
+}

@@ -1,0 +1,6 @@
+{
+  "domain": "http://localhost:9204",
+  "project": "free_youtube",
+  "interval": 5,
+  "debug": false
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <title>Notification</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="./notification.css">
+</head>
+
+<body class="notification-body">
+    <div class="notification-container" id="container">
+        <div class="notification-content">
+            <div class="notification-header">
+                <div class="app-icon">🔔</div>
+                <span class="app-name">通知監控</span>
+                <span class="time" id="time">現在</span>
+                <button class="close-btn" id="close-btn">×</button>
+            </div>
+            <div class="notification-body-content">
+                <h3 id="title">測試標題</h3>
+                <p id="message">這是一則測試通知訊息內容...</p>
+            </div>
+        </div>
+        <div class="notification-progress">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+    </div>
+    <script type="module" src="./notification.ts"></script>
+</body>
+
+</html>
