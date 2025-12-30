@@ -30,7 +30,19 @@ notification_app/
 | 版本 | 語言/框架 | 支援平台 | 狀態 |
 |------|-----------|----------|------|
 | [Go Client](./go-client/) | Go + Fyne | Windows | ✅ 穩定 |
-| [Electron Client](./electron-client/) | TypeScript + Electron | Windows / macOS / Linux | 🚧 開發中 |
+| [Electron Client](./electron-client/) | TypeScript + Electron | Windows / macOS / Linux | ✅ 穩定 |
+
+## 📥 下載
+
+前往 [Releases](https://github.com/YOUR_USERNAME/notification_windows/releases) 頁面下載最新版本：
+
+| 平台 | 類型 | 檔案 |
+|------|------|------|
+| Windows | 安裝版 | `NotificationClient-Setup-x.x.x.exe` |
+| Windows | 免安裝版 | `NotificationClient-Portable-x.x.x.exe` |
+| macOS | 安裝檔 | `NotificationClient-x.x.x-mac.dmg` |
+| Linux | AppImage | `NotificationClient-x.x.x-linux.AppImage` |
+| Linux | DEB | `NotificationClient-x.x.x-linux-amd64.deb` |
 
 ## 功能特點
 

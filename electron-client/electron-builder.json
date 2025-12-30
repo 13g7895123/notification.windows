@@ -1,7 +1,9 @@
 {
     "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
     "appId": "com.notification.client",
-    "productName": "通知監控程式",
+    "productName": "NotificationClient",
+    "executableName": "NotificationClient",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
         "output": "release",
         "buildResources": "assets"
@@ -25,7 +27,11 @@
                 ]
             }
         ],
-        "icon": "assets/icon.ico"
+        "icon": "assets/icon.ico",
+        "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+        "artifactName": "${productName}-Portable-${version}.${ext}"
     },
     "mac": {
         "target": [
@@ -33,7 +39,8 @@
             "zip"
         ],
         "icon": "assets/icon.icns",
-        "category": "public.app-category.utilities"
+        "category": "public.app-category.utilities",
+        "artifactName": "${productName}-${version}-mac.${ext}"
     },
     "linux": {
         "target": [
@@ -41,13 +48,22 @@
             "deb"
         ],
         "icon": "assets/icon.png",
-        "category": "Utility"
+        "category": "Utility",
+        "artifactName": "${productName}-${version}-linux.${ext}"
+    },
+    "deb": {
+        "artifactName": "${productName}-${version}-linux-amd64.${ext}"
     },
     "nsis": {
         "oneClick": false,
         "perMachine": false,
         "allowToChangeInstallationDirectory": true,
         "installerIcon": "assets/icon.ico",
-        "uninstallerIcon": "assets/icon.ico"
+        "uninstallerIcon": "assets/icon.ico",
+        "shortcutName": "通知監控程式"
+    },
+    "publish": {
+        "provider": "github",
+        "releaseType": "release"
     }
 }
