@@ -1,0 +1,2 @@
+# 此檔案用於保持 logs 目錄在 git 中
+# 實際的 .log 檔案會被 .gitignore 忽略
