@@ -29,7 +29,10 @@
         "desktop",
         "cross-platform"
     ],
-    "author": "",
+    "author": {
+        "name": "13g7895123",
+        "email": "13g7895123@users.noreply.github.com"
+    },
     "license": "MIT",
     "devDependencies": {
         "@types/node": "^20.10.0",
