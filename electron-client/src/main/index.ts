@@ -134,6 +134,9 @@ function startMonitoring(): void {
     const config = configManager.getConfig();
     isMonitoring = true;
 
+    // 套用 debug 模式設定
+    logger.setDebugMode(config.debug);
+
     logger.info(`監控已啟動 - 間隔: ${config.interval} 秒`);
 
     // 立即檢查一次
@@ -168,6 +171,10 @@ ipcMain.handle('get-config', () => {
 
 ipcMain.handle('save-config', (_event, config) => {
     configManager.saveConfig(config);
+    // 同步更新 logger 的 debug 模式
+    if (config.debug !== undefined) {
+        logger.setDebugMode(config.debug);
+    }
     return true;
 });
 
