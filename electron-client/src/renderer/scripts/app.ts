@@ -11,7 +11,7 @@ declare global {
             getMonitoringStatus: () => Promise<boolean>;
             testApi: () => Promise<{ success: boolean; message: string }>;
             testNotification: () => Promise<boolean>;
-            openLogsFolder: () => Promise<{ success: boolean; path?: string; error?: string }>;
+
             onNotificationReceived: (callback: (notification: NotificationItem) => void) => void;
             onMonitoringStatus: (callback: (status: boolean) => void) => void;
             onError: (callback: (error: string) => void) => void;
@@ -47,7 +47,7 @@ const elements = {
     btnStart: document.getElementById('btn-start') as HTMLButtonElement,
     btnStop: document.getElementById('btn-stop') as HTMLButtonElement,
     btnTestNotify: document.getElementById('btn-test-notify') as HTMLButtonElement,
-    btnOpenLogs: document.getElementById('btn-open-logs') as HTMLButtonElement,
+
     btnCopyGuide: document.getElementById('btn-copy-guide') as HTMLButtonElement,
     statusBadge: document.getElementById('status-badge') as HTMLDivElement,
     historyList: document.getElementById('history-list') as HTMLDivElement,
@@ -151,19 +151,7 @@ function setupEventListeners(): void {
         await window.electronAPI.stopMonitoring();
     });
 
-    // 打開 logs 資料夾
-    elements.btnOpenLogs?.addEventListener('click', async () => {
-        try {
-            const result = await window.electronAPI.openLogsFolder();
-            if (result.success) {
-                addHistoryItem('已打開 Logs 資料夾', result.path || '', 'success');
-            } else {
-                addHistoryItem('打開 Logs 失敗', result.error || '', 'error');
-            }
-        } catch (error) {
-            addHistoryItem('打開 Logs 失敗', String(error), 'error');
-        }
-    });
+
 
     // 視窗控制
     document.getElementById('win-min')?.addEventListener('click', () => {
@@ -178,7 +166,7 @@ function setupEventListeners(): void {
     document.getElementById('toggle-api-key')?.addEventListener('click', () => {
         const apiKeyInput = elements.apiKey;
         const toggleBtn = document.getElementById('toggle-api-key');
-        
+
         if (apiKeyInput.type === 'password') {
             apiKeyInput.type = 'text';
             if (toggleBtn) {
@@ -206,11 +194,11 @@ function setupEventListeners(): void {
     elements.btnCopyGuide?.addEventListener('click', async () => {
         const originalText = elements.btnCopyGuide.innerHTML;
         elements.btnCopyGuide.disabled = true;
-        
+
         try {
             const markdown = getIntegrationGuideMarkdown();
             await navigator.clipboard.writeText(markdown);
-            
+
             elements.btnCopyGuide.innerHTML = `
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -218,7 +206,7 @@ function setupEventListeners(): void {
                 <span>已複製!</span>
             `;
             addHistoryItem('整合說明已複製', 'Markdown 格式已複製到剪貼簿', 'success');
-            
+
             setTimeout(() => {
                 elements.btnCopyGuide.innerHTML = originalText;
                 elements.btnCopyGuide.disabled = false;
@@ -339,7 +327,7 @@ function addHistoryItem(title: string, message: string, type: 'info' | 'success'
         const header = item.querySelector('.history-header') as HTMLElement;
         const detailsEl = item.querySelector('.history-details') as HTMLElement;
         const expandIcon = item.querySelector('.expand-icon') as HTMLElement;
-        
+
         header.addEventListener('click', () => {
             const isExpanded = detailsEl.style.display !== 'none';
             detailsEl.style.display = isExpanded ? 'none' : 'block';
@@ -356,7 +344,7 @@ function addHistoryItem(title: string, message: string, type: 'info' | 'success'
             copyBtn.addEventListener('click', async (e) => {
                 e.stopPropagation();
                 const originalHtml = copyBtn.innerHTML;
-                
+
                 try {
                     await navigator.clipboard.writeText(detailsJson);
                     copyBtn.innerHTML = `
@@ -366,7 +354,7 @@ function addHistoryItem(title: string, message: string, type: 'info' | 'success'
                         已複製
                     `;
                     copyBtn.classList.add('copied');
-                    
+
                     setTimeout(() => {
                         copyBtn.innerHTML = originalHtml;
                         copyBtn.classList.remove('copied');
