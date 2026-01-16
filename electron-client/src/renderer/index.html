@@ -29,10 +29,16 @@
         <h1>Notify<span class="highlight">Hub</span></h1>
       </div>
 
-      <div class="status-indicator" id="status-badge">
-        <div class="status-ring"></div>
-        <div class="status-dot"></div>
-        <span class="status-text">OFFLINE</span>
+      <div class="status-container">
+        <div class="status-indicator" id="status-badge">
+          <div class="status-ring"></div>
+          <div class="status-dot"></div>
+          <span class="status-text">OFFLINE</span>
+        </div>
+        <div class="status-indicator websocket-status" id="ws-status-badge">
+          <div class="status-dot"></div>
+          <span class="status-text">WS: DISCONNECTED</span>
+        </div>
       </div>
       <div class="window-controls">
         <button id="win-min" class="win-btn">
@@ -83,6 +89,14 @@
           </div>
         </div>
 
+        <div class="input-group">
+          <label for="websocketUrl">WEBSOCKET URL</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔌</span>
+            <input type="text" id="websocketUrl" placeholder="wss://notify.try-8verything.com/ws" spellcheck="false">
+          </div>
+        </div>
+
         <div class="row-group">
           <div class="input-group">
             <label for="interval">INTERVAL (SEC)</label>
@@ -94,10 +108,18 @@
 
           <div class="toggle-group">
             <label class="toggle-switch">
+              <input type="checkbox" id="websocketEnabled">
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">WEBSOCKET</span>
+          </div>
+
+          <div class="toggle-group">
+            <label class="toggle-switch">
               <input type="checkbox" id="debug">
               <span class="slider"></span>
             </label>
-            <span class="toggle-label">DEBUG MODE</span>
+            <span class="toggle-label">DEBUG</span>
           </div>
         </div>
 

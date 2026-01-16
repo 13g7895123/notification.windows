@@ -4,11 +4,14 @@ import { ConfigManager } from './config/config';
 import { ApiClient } from './api/client';
 import { Logger } from './logger/logger';
 import { NotificationManager } from './notification/manager';
+import { WebSocketClient, WebSocketStatus } from './api/websocket';
 
 let mainWindow: BrowserWindow | null = null;
 let tray: Tray | null = null;
 let isMonitoring = false;
 let monitoringInterval: NodeJS.Timeout | null = null;
+let wsClient: WebSocketClient | null = null;
+let wsConnected = false;
 
 const configManager = new ConfigManager();
 const logger = new Logger();
@@ -128,6 +131,57 @@ async function checkNotifications(): Promise<void> {
     }
 }
 
+function handleWebSocketMessage(data: any): void {
+    if (data.type === 'new_notification' && data.data) {
+        const notification = data.data;
+        logger.info(`WebSocket 收到新通知: ${notification.title}`);
+
+        // 顯示通知
+        notificationManager.showNotification({
+            id: notification.id,
+            title: notification.title,
+            message: notification.message,
+            duration: 5000
+        });
+
+        // 更新狀態為已送達
+        const config = configManager.getConfig();
+        const apiClient = new ApiClient(config.domain, config.apiKey, logger);
+        apiClient.updateNotificationStatus(notification.id, 'delivered').catch(err => {
+            logger.error(`更新通知狀態失敗: ${err}`);
+        });
+
+        // 傳送到渲染程序更新 UI
+        mainWindow?.webContents.send('notification-received', notification);
+    } else if (data.type === 'pong') {
+        logger.debug('收到 WebSocket Pong');
+    }
+}
+
+function handleWebSocketStatusChange(status: WebSocketStatus): void {
+    logger.info(`WebSocket 狀態變更: ${status}`);
+    wsConnected = (status === 'connected');
+
+    // 傳送狀態同步到 renderer
+    mainWindow?.webContents.send('websocket-status', status);
+
+    // 如果連線成功，確保輪詢關閉
+    if (wsConnected && isMonitoring) {
+        if (monitoringInterval) {
+            logger.info('WebSocket 已連線，停止間隔輪詢');
+            clearInterval(monitoringInterval);
+            monitoringInterval = null;
+        }
+    } else if (!wsConnected && isMonitoring && !monitoringInterval) {
+        // 如果 WebSocket 斷線且正在監控中，重啟輪詢作為備援
+        const config = configManager.getConfig();
+        logger.info(`WebSocket 斷線，重啟間隔輪詢 (${config.interval} 秒)`);
+        monitoringInterval = setInterval(() => {
+            checkNotifications();
+        }, config.interval * 1000);
+    }
+}
+
 function startMonitoring(): void {
     if (isMonitoring) return;
 
@@ -137,15 +191,32 @@ function startMonitoring(): void {
     // 套用 debug 模式設定
     logger.setDebugMode(config.debug);
 
-    logger.info(`監控已啟動 - 間隔: ${config.interval} 秒`);
+    logger.info(`監控已啟動`);
 
-    // 立即檢查一次
+    // 啟動 WebSocket (如果啟用)
+    if (config.websocketEnabled) {
+        if (wsClient) {
+            wsClient.disconnect();
+        }
+        wsClient = new WebSocketClient(
+            config.websocketUrl,
+            logger,
+            handleWebSocketMessage,
+            handleWebSocketStatusChange
+        );
+        wsClient.connect();
+    }
+
+    // 立即檢查一次 (補足斷線期間可能漏掉的)
     checkNotifications();
 
-    // 設定定期檢查
-    monitoringInterval = setInterval(() => {
-        checkNotifications();
-    }, config.interval * 1000);
+    // 如果沒啟用 WebSocket 或連線未完成，先啟動輪詢
+    if (!config.websocketEnabled || !wsConnected) {
+        logger.info(`啟動間隔輪詢 - 間隔: ${config.interval} 秒`);
+        monitoringInterval = setInterval(() => {
+            checkNotifications();
+        }, config.interval * 1000);
+    }
 
     mainWindow?.webContents.send('monitoring-status', true);
 }
@@ -160,8 +231,15 @@ function stopMonitoring(): void {
         monitoringInterval = null;
     }
 
+    if (wsClient) {
+        wsClient.disconnect();
+        wsClient = null;
+    }
+
+    wsConnected = false;
     logger.info('監控已停止');
     mainWindow?.webContents.send('monitoring-status', false);
+    mainWindow?.webContents.send('websocket-status', 'disconnected');
 }
 
 // IPC 事件處理

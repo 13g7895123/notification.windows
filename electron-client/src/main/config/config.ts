@@ -5,6 +5,8 @@ export interface AppConfig {
     apiKey: string;
     interval: number;
     debug: boolean;
+    websocketUrl: string;
+    websocketEnabled: boolean;
 }
 
 const defaultConfig: AppConfig = {
@@ -12,6 +14,8 @@ const defaultConfig: AppConfig = {
     apiKey: '',
     interval: 5,
     debug: false,
+    websocketUrl: 'wss://notify.try-8verything.com/ws',
+    websocketEnabled: true,
 };
 
 export class ConfigManager {
@@ -40,6 +44,14 @@ export class ConfigManager {
                     type: 'boolean',
                     default: false,
                 },
+                websocketUrl: {
+                    type: 'string',
+                    default: 'wss://notify.try-8verything.com/ws',
+                },
+                websocketEnabled: {
+                    type: 'boolean',
+                    default: true,
+                },
             },
         });
     }
@@ -50,6 +62,8 @@ export class ConfigManager {
             apiKey: this.store.get('apiKey'),
             interval: this.store.get('interval'),
             debug: this.store.get('debug'),
+            websocketUrl: this.store.get('websocketUrl'),
+            websocketEnabled: this.store.get('websocketEnabled'),
         };
     }
 
@@ -65,6 +79,12 @@ export class ConfigManager {
         }
         if (config.debug !== undefined) {
             this.store.set('debug', config.debug);
+        }
+        if (config.websocketUrl !== undefined) {
+            this.store.set('websocketUrl', config.websocketUrl);
+        }
+        if (config.websocketEnabled !== undefined) {
+            this.store.set('websocketEnabled', config.websocketEnabled);
         }
     }
 

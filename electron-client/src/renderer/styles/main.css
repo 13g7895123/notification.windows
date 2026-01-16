@@ -146,6 +146,11 @@ body {
 }
 
 /* Status Badge */
+.status-container {
+  display: flex;
+  gap: 12px;
+}
+
 .status-indicator {
   display: flex;
   align-items: center;
@@ -183,6 +188,25 @@ body {
 
 .status-indicator.active .status-text {
   color: var(--success);
+}
+
+/* WebSocket Status Special Colors */
+.websocket-status.connecting .status-dot {
+  background-color: var(--warning);
+  box-shadow: 0 0 8px var(--warning);
+}
+
+.websocket-status.connecting .status-text {
+  color: var(--warning);
+}
+
+.websocket-status.error .status-dot {
+  background-color: var(--danger);
+  box-shadow: 0 0 8px var(--danger);
+}
+
+.websocket-status.error .status-text {
+  color: var(--danger);
 }
 
 /* Dashboard Layout */

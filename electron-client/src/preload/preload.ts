@@ -32,6 +32,9 @@ const electronAPI = {
     onApiError: (callback: (error: { message: string; details: any }) => void) => {
         ipcRenderer.on('api-error', (_event, error) => callback(error));
     },
+    onWebSocketStatus: (callback: (status: string) => void) => {
+        ipcRenderer.on('websocket-status', (_event, status) => callback(status));
+    },
 
     // 移除事件監聽
     removeAllListeners: () => {
@@ -39,6 +42,7 @@ const electronAPI = {
         ipcRenderer.removeAllListeners('monitoring-status');
         ipcRenderer.removeAllListeners('error');
         ipcRenderer.removeAllListeners('api-error');
+        ipcRenderer.removeAllListeners('websocket-status');
     },
 };
 

@@ -16,6 +16,7 @@ declare global {
             onMonitoringStatus: (callback: (status: boolean) => void) => void;
             onError: (callback: (error: string) => void) => void;
             onApiError: (callback: (error: { message: string; details: any }) => void) => void;
+            onWebSocketStatus: (callback: (status: string) => void) => void;
             removeAllListeners: () => void;
         };
     }
@@ -26,6 +27,8 @@ interface AppConfig {
     apiKey: string;
     interval: number;
     debug: boolean;
+    websocketUrl: string;
+    websocketEnabled: boolean;
 }
 
 interface NotificationItem {
@@ -50,8 +53,12 @@ const elements = {
 
     btnCopyGuide: document.getElementById('btn-copy-guide') as HTMLButtonElement,
     statusBadge: document.getElementById('status-badge') as HTMLDivElement,
+    wsStatusBadge: document.getElementById('ws-status-badge') as HTMLDivElement,
     historyList: document.getElementById('history-list') as HTMLDivElement,
     appVersion: document.getElementById('app-version') as HTMLDivElement,
+
+    websocketUrl: document.getElementById('websocketUrl') as HTMLInputElement,
+    websocketEnabled: document.getElementById('websocketEnabled') as HTMLInputElement,
 };
 
 // 最大歷史記錄數量
@@ -65,6 +72,8 @@ async function init(): Promise<void> {
     elements.apiKey.value = config.apiKey;
     elements.interval.value = String(config.interval);
     elements.debug.checked = config.debug;
+    elements.websocketUrl.value = config.websocketUrl;
+    elements.websocketEnabled.checked = config.websocketEnabled;
 
     // 顯示版本號
     const version = await window.electronAPI.getAppVersion();
@@ -89,6 +98,8 @@ function setupEventListeners(): void {
             apiKey: elements.apiKey.value,
             interval: parseInt(elements.interval.value) || 5,
             debug: elements.debug.checked,
+            websocketUrl: elements.websocketUrl.value,
+            websocketEnabled: elements.websocketEnabled.checked,
         };
 
         await window.electronAPI.saveConfig(config);
@@ -107,6 +118,8 @@ function setupEventListeners(): void {
                 apiKey: elements.apiKey.value,
                 interval: parseInt(elements.interval.value) || 5,
                 debug: elements.debug.checked,
+                websocketUrl: elements.websocketUrl.value,
+                websocketEnabled: elements.websocketEnabled.checked,
             };
             await window.electronAPI.saveConfig(config);
 
@@ -147,6 +160,8 @@ function setupEventListeners(): void {
             apiKey: elements.apiKey.value,
             interval: parseInt(elements.interval.value) || 5,
             debug: elements.debug.checked,
+            websocketUrl: elements.websocketUrl.value,
+            websocketEnabled: elements.websocketEnabled.checked,
         };
         await window.electronAPI.saveConfig(config);
 
@@ -251,6 +266,47 @@ function setupIPCListeners(): void {
     window.electronAPI.onApiError((error: { message: string; details: any }) => {
         addHistoryItem('API 錯誤', error.message, 'error', error.details);
     });
+
+    // WebSocket 狀態變更
+    window.electronAPI.onWebSocketStatus((status: string) => {
+        updateWebSocketUI(status);
+        if (status === 'connected') {
+            addHistoryItem('WebSocket 已連線', '即時通知功能已啟用', 'success');
+        } else if (status === 'error') {
+            addHistoryItem('WebSocket 錯誤', '連線發生問題', 'error');
+        } else if (status === 'disconnected') {
+            addHistoryItem('WebSocket 已斷線', '系統將切換回輪詢模式', 'info');
+        }
+    });
+}
+
+function updateWebSocketUI(status: string): void {
+    const badge = elements.wsStatusBadge;
+    const text = badge.querySelector('.status-text');
+
+    badge.classList.remove('active', 'connecting', 'error', 'disconnected');
+
+    if (text) {
+        switch (status) {
+            case 'connected':
+                badge.classList.add('active');
+                text.textContent = 'WS: CONNECTED';
+                break;
+            case 'connecting':
+                badge.classList.add('connecting');
+                text.textContent = 'WS: CONNECTING...';
+                break;
+            case 'error':
+                badge.classList.add('error');
+                text.textContent = 'WS: ERROR';
+                break;
+            case 'disconnected':
+            default:
+                badge.classList.add('disconnected');
+                text.textContent = 'WS: DISCONNECTED';
+                break;
+        }
+    }
 }
 
 function updateMonitoringUI(isMonitoring: boolean): void {
