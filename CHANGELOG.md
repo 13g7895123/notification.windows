@@ -12,6 +12,21 @@
 
 ---
 
+## [1.1.1] - 2026-01-18
+
+### Improved
+- 🔍 **WebSocket 錯誤訊息增強**：大幅提升錯誤訊息的詳細程度,方便除錯。
+  - 顯示具體的錯誤代碼 (如 `ECONNREFUSED`, `ETIMEDOUT`)
+  - 顯示重連次數和連線 URL
+  - 提供完整的系統層級錯誤資訊 (errno, syscall, address, port)
+  - 錯誤詳情可展開查看完整 JSON
+  - 支援複製錯誤 JSON 用於問題回報
+
+### Fixed
+- 修正 WebSocket 錯誤時僅顯示「連線發生問題」的問題
+
+---
+
 ## [1.1.0] - 2026-01-17
 
 ### Added
