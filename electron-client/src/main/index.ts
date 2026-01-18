@@ -158,24 +158,24 @@ function handleWebSocketMessage(data: any): void {
     }
 }
 
-function handleWebSocketStatusChange(status: WebSocketStatus): void {
+function handleWebSocketStatusChange(status: WebSocketStatus, errorDetails?: any): void {
     logger.info(`WebSocket 狀態變更: ${status}`);
     wsConnected = (status === 'connected');
 
-    // 傳送狀態同步到 renderer
-    mainWindow?.webContents.send('websocket-status', status);
+    // 傳送狀態同步到 renderer (包含錯誤詳情)
+    mainWindow?.webContents.send('websocket-status', status, errorDetails);
 
-    // 如果連線成功，確保輪詢關閉
+    // 如果連線成功,確保輪詢關閉
     if (wsConnected && isMonitoring) {
         if (monitoringInterval) {
-            logger.info('WebSocket 已連線，停止間隔輪詢');
+            logger.info('WebSocket 已連線,停止間隔輪詢');
             clearInterval(monitoringInterval);
             monitoringInterval = null;
         }
     } else if (!wsConnected && isMonitoring && !monitoringInterval) {
-        // 如果 WebSocket 斷線且正在監控中，重啟輪詢作為備援
+        // 如果 WebSocket 斷線且正在監控中,重啟輪詢作為備援
         const config = configManager.getConfig();
-        logger.info(`WebSocket 斷線，重啟間隔輪詢 (${config.interval} 秒)`);
+        logger.info(`WebSocket 斷線,重啟間隔輪詢 (${config.interval} 秒)`);
         monitoringInterval = setInterval(() => {
             checkNotifications();
         }, config.interval * 1000);

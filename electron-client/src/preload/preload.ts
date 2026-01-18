@@ -32,8 +32,8 @@ const electronAPI = {
     onApiError: (callback: (error: { message: string; details: any }) => void) => {
         ipcRenderer.on('api-error', (_event, error) => callback(error));
     },
-    onWebSocketStatus: (callback: (status: string) => void) => {
-        ipcRenderer.on('websocket-status', (_event, status) => callback(status));
+    onWebSocketStatus: (callback: (status: string, errorDetails?: any) => void) => {
+        ipcRenderer.on('websocket-status', (_event, status, errorDetails) => callback(status, errorDetails));
     },
 
     // 移除事件監聽

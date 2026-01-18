@@ -16,7 +16,7 @@ declare global {
             onMonitoringStatus: (callback: (status: boolean) => void) => void;
             onError: (callback: (error: string) => void) => void;
             onApiError: (callback: (error: { message: string; details: any }) => void) => void;
-            onWebSocketStatus: (callback: (status: string) => void) => void;
+            onWebSocketStatus: (callback: (status: string, errorDetails?: any) => void) => void;
             removeAllListeners: () => void;
         };
     }
@@ -268,14 +268,27 @@ function setupIPCListeners(): void {
     });
 
     // WebSocket 狀態變更
-    window.electronAPI.onWebSocketStatus((status: string) => {
+    window.electronAPI.onWebSocketStatus((status: string, errorDetails?: any) => {
         updateWebSocketUI(status);
         if (status === 'connected') {
             addHistoryItem('WebSocket 已連線', '即時通知功能已啟用', 'success');
         } else if (status === 'error') {
-            addHistoryItem('WebSocket 錯誤', '連線發生問題', 'error');
+            // 顯示詳細錯誤訊息
+            let errorMessage = '連線發生問題';
+            if (errorDetails) {
+                const parts = [];
+                if (errorDetails.message) parts.push(errorDetails.message);
+                if (errorDetails.errorCode) parts.push(`錯誤代碼: ${errorDetails.errorCode}`);
+                if (errorDetails.reconnectAttempts > 0) parts.push(`重連次數: ${errorDetails.reconnectAttempts}`);
+                errorMessage = parts.join(' | ');
+            }
+            addHistoryItem('WebSocket 錯誤', errorMessage, 'error', errorDetails);
         } else if (status === 'disconnected') {
-            addHistoryItem('WebSocket 已斷線', '系統將切換回輪詢模式', 'info');
+            let disconnectMessage = '系統將切換回輪詢模式';
+            if (errorDetails && errorDetails.message) {
+                disconnectMessage = errorDetails.message;
+            }
+            addHistoryItem('WebSocket 已斷線', disconnectMessage, 'info');
         }
     });
 }
